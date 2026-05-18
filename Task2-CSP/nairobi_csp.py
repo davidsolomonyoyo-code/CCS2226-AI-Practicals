@@ -12,9 +12,9 @@ import matplotlib.patches as mpatches
 from matplotlib.patches import Polygon
 import numpy as np
 
-# ─────────────────────────────────────────────
+
 # NAIROBI 17 SUB-COUNTIES AND THEIR BORDERS
-# ─────────────────────────────────────────────
+
 
 nairobi = {
     'Westlands':        ['Roysambu', 'Kasarani', 'Starehe', 'Dagoretti North'],
