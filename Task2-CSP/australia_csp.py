@@ -14,9 +14,9 @@ from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 import numpy as np
 
-# ─────────────────────────────────────────────
+
 # AUSTRALIA MAP - REGIONS AND THEIR BORDERS
-# ─────────────────────────────────────────────
+
 
 australia = {
     'WA':  ['NT', 'SA'],
