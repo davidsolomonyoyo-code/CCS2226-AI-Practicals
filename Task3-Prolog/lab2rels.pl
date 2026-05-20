@@ -1,13 +1,30 @@
 /* ================================================
-   MA410 Prolog Practical 2
-   lab2rels.pl - Relationship Definitions
+   MA410 Prolog Practical 2 & CCS 2226 Task 3
+   lab2rels.pl - All Relationship Rules
    Name: David Osoro Solomon
    Reg No: CIT-223-089/2023
-   ================================================ */
 
 
 /* ─────────────────────────────────────────────
-   SECTION 1c - MOTHER AND FATHER DEFINITIONS
+   MARRIAGE FACTS
+   ───────────────────────────────────────────── */
+
+married(george, mary).
+married(mary, george).
+married(henry, susan).
+married(susan, henry).
+married(kate, brian).
+married(brian, kate).
+married(tom, ann).
+married(ann, tom).
+married(grace, james).
+married(james, grace).
+married(john, rose).
+married(rose, john).
+
+
+/* ─────────────────────────────────────────────
+   SECTION 1c - MOTHER AND FATHER
    ───────────────────────────────────────────── */
 
 mother(X, Y) :- parent(X, Y), female(X).
@@ -15,65 +32,59 @@ father(X, Y) :- parent(X, Y), male(X).
 
 
 /* ─────────────────────────────────────────────
-   SECTION 1d - EXPERIMENTING WITH OPERATORS
-   = means unification (can they be made equal)
-   == means strict equality (already equal)
-   \== means not equal
-   \= means cannot be unified
+   SECTION 1d - DIFF OPERATOR
    ───────────────────────────────────────────── */
-
-/* Examples:
-   ?- a = a.        true  (same atom)
-   ?- X = a.        true  (X unifies with a)
-   ?- a == a.       true  (strictly equal)
-   ?- X == a.       false (X not yet bound)
-   ?- a \== b.      true  (a and b are different)
-   ?- X \= a.       false (X can unify with a)
-*/
 
 diff(X, Y) :- X \== Y.
 
 
 /* ─────────────────────────────────────────────
-   SECTION 1f - DEFINING ALL PREDICATES
+   SECTION 1f - ALL RELATIONSHIP RULES
    ───────────────────────────────────────────── */
 
 /* Sibling: share at least one parent */
 sibling(X, Y) :- parent(P, X), parent(P, Y), X \== Y.
 
-/* Brother: sibling who is male */
+/* Brother and Sister */
 brother(X, Y) :- sibling(X, Y), male(X).
+sister(X, Y)  :- sibling(X, Y), female(X).
 
-/* Sister: sibling who is female */
-sister(X, Y) :- sibling(X, Y), female(X).
+/* Grandparent, Grandfather, Grandmother */
+grandparent(X, Z)  :- parent(X, Y), parent(Y, Z).
+grandfather(X, Z)  :- grandparent(X, Z), male(X).
+grandmother(X, Z)  :- grandparent(X, Z), female(X).
 
-/* Grandparent: parent of a parent */
-grandparent(X, Z) :- parent(X, Y), parent(Y, Z).
-
-/* Grandmother: grandparent who is female */
-grandmother(X, Z) :- grandparent(X, Z), female(X).
-
-/* Grandfather: grandparent who is male */
-grandfather(X, Z) :- grandparent(X, Z), male(X).
+/* Child and Grandchild */
+child(Y, X)      :- parent(X, Y).
+grandchild(Z, X) :- grandparent(X, Z).
 
 /* Blood uncle: brother of a parent */
-bl_uncle(X, Y) :- parent(P, Y), brother(X, P).
+bl_uncle(X, Y) :-
+    parent(P, Y),
+    brother(X, P),
+    X \== Y.
 
-/* Uncle in law: married to an aunt */
-uncle_in_law(X, Y) :- parent(P, Y), sister(S, P), married(X, S).
+/* Uncle in law: married to a sister of a parent */
+uncle_in_law(X, Y) :-
+    parent(P, Y),
+    sister(S, P),
+    married(X, S),
+    male(X),
+    X \== Y.
 
-/* Uncle: any type of uncle */
+/* Uncle: either blood uncle or uncle in law */
 uncle(X, Y) :- bl_uncle(X, Y).
 uncle(X, Y) :- uncle_in_law(X, Y).
 
 /* Aunt: sister of a parent */
-aunt(X, Y) :- parent(P, Y), sister(X, P).
+aunt(X, Y) :-
+    parent(P, Y),
+    sister(X, P),
+    X \== Y.
 
-/* Ancestor */
+/* Ancestor and Descendant */
 ancestor(X, Y) :- parent(X, Y).
 ancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).
-
-/* Descendant */
 descendant(X, Y) :- ancestor(Y, X).
 
 /* First cousin: parents are siblings */
@@ -83,29 +94,16 @@ firstcousin(X, Y) :-
     sibling(PX, PY),
     X \== Y.
 
-/* Aunt and uncle (any type) */
-aunt_uncle(X, Y) :- aunt(X, Y).
-aunt_uncle(X, Y) :- uncle(X, Y).
-
 
 /* ─────────────────────────────────────────────
-   SECTION 3 - AI BASED QUESTIONS
-   Using setof to organise sets
+   SECTION 3 - SETOF LIST QUERIES
+   These return results as a clean list
    ───────────────────────────────────────────── */
 
-/* Get all sisters of X as a list */
-sister_list(X, L) :- setof(Y, sister(Y, X), L).
-
-/* Get all brothers of X as a list */
-brother_list(X, L) :- setof(Y, brother(Y, X), L).
-
-/* Get all siblings of X as a list */
-sibling_list(X, L) :- setof(Y, sibling(Y, X), L).
-
-/* Get all grandparents of X as a list */
+sister_list(X, L)      :- setof(Y, sister(Y, X), L).
+brother_list(X, L)     :- setof(Y, brother(Y, X), L).
+sibling_list(X, L)     :- setof(Y, sibling(Y, X), L).
 grandparent_list(X, L) :- setof(Y, grandparent(Y, X), L).
-
-/* Get cousins of X as a list */
-cousin_list(X, L) :- setof(Y, firstcousin(Y, X), L).
+cousin_list(X, L)      :- setof(Y, firstcousin(Y, X), L).
 
 
